@@ -2,10 +2,16 @@ const express = require('express')
 const app = require('express')();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
-const port = 3000
+const bodyParser = require('body-parser')
+const port = process.env.PORT || 3000
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config()
+}
 
 let onlineCount = 0;
 app.use(express.static('public'))
+app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.json())
 app.get('/', (req, res) => {
   res.send('<h1>你好web秀</h1>');
 });
