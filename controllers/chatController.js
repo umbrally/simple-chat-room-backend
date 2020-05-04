@@ -1,3 +1,6 @@
+const db = require('../models')
+const Msg = db.Msg
+
 const chatController = {
   getHistoricalMsgs: (req, res) => {
 
