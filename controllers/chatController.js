@@ -4,7 +4,7 @@ const User = db.User
 
 const chatController = {
   getHistoricalMsgs: (req, res) => {
-    Msg.findAll({ include: User }).then(
+    Msg.findAll({ order: [['createdAt', 'ASC']], include: User }).then(
       results => {
         return res.json({
           historicalMsgs: results
@@ -12,14 +12,12 @@ const chatController = {
       }
     )
   },
-  addMsg: (req, res) => {
-    Msg.create({
-      content: req.body.msg,
-      UserId: 1
+  addMsg: (msg) => {
+    return Msg.create({
+      content: msg.content,
+      UserId: msg.UserId
     }).then(msg => {
-      res.json(
-        { status: 'success', message: msg }
-      )
+      return true
     })
   }
 }

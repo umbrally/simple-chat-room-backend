@@ -54,6 +54,13 @@ const userController = {
       })
     }
   },
+
+  getCurrentUser: (req, res) => {
+    User.findByPk(req.user.id)
+      .then(user => {
+        res.json({ id: user.id, name: user.name, email: user.email, image: user.image })
+      })
+  },
 }
 
 module.exports = userController
