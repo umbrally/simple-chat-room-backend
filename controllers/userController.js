@@ -36,7 +36,7 @@ const userController = {
 
   signUp: (req, res) => {
     if (req.body.passwordCheck !== req.body.password) {
-      return res.json({ status: 'error', message: '兩次密碼輸入不同！' })
+      return res.json({ status: 'error', message: '兩次密碼輸入不同！', 'one': req.body.passwordCheck, 'two': req.body.password })
     } else {
       User.findOne({ where: { email: req.body.email } }).then(user => {
         if (user) {
