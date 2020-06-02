@@ -2,7 +2,6 @@ const express = require('express')
 const app = require('express')();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
-const chat = io.of('/chat')
 const bodyParser = require('body-parser')
 const cors = require('cors')
 const port = process.env.PORT || 3000
@@ -28,20 +27,20 @@ app.use('/chat', passport.authenticate('jwt', { session: false }),
 
 const sockets = []
 
-chat.on('connection', (socket) => {
+io.on('connection', (socket) => {
   // 有連線發生時增加人數
   // console.log('已經登入?', authenticated)
   onlineCount++;
   console.log('socket 連線', onlineCount)
   console.log('誰上線?', userName)
   // 發送人數給網頁
-  chat.emit("online", onlineCount);
+  io.emit("online", onlineCount);
   sockets.push(socket.id)
 
   // 前端使用者登入後傳入的event
   socket.on("signIn", (user) => {
     console.log('登入者?', user.userName)
-    chat.emit("signInUser", user)
+    io.emit("signInUser", user)
   })
   // 前端使用者輸入訊息
   socket.on("send", async (msg) => {
@@ -53,7 +52,7 @@ chat.on('connection', (socket) => {
       let result = await chatController.addMsg(msg)
       if (!result) { throw new Error('儲存失敗') }
       // 廣播訊息到聊天室
-      chat.emit("msg", msg);
+      io.emit("msg", msg);
     }
     catch (error) {
       console.error(error)
@@ -64,14 +63,14 @@ chat.on('connection', (socket) => {
   socket.on('disconnect', () => {
     // 有人離線了，扣掉連線人數
     onlineCount = (onlineCount < 0) ? 0 : onlineCount -= 1;
-    chat.emit("online", onlineCount);
+    io.emit("online", onlineCount);
     sockets.slice(sockets.indexOf(socket.id), 0)
     console.log('有人離線了')
   });
 });
 
 http.listen(port, () => {
-  console.log('listening on *:3000');
+  console.log('APP is running');
 });
 
 require('./routes')(app)
